@@ -4,8 +4,10 @@ import cn.crane4j.annotation.ArgAutoOperate;
 import cn.crane4j.annotation.Assemble;
 import cn.crane4j.annotation.AutoOperate;
 import cn.crane4j.annotation.Mapping;
+import cn.crane4j.core.container.Container;
 import cn.crane4j.core.container.LambdaContainer;
 import cn.crane4j.springboot.support.Crane4jApplicationContext;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.junit.Assert;
@@ -21,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -40,10 +43,11 @@ public class AutoOperateExample {
 
     @Before
     public void init() {
-        context.getRegisteredContainers().putIfAbsent("student", LambdaContainer.forLambda(
+        Supplier<Container<Integer>> supplier = () -> LambdaContainer.forLambda(
             "student", ids -> ids.stream()
                 .collect(Collectors.toMap(Function.identity(), id -> "student" + id))
-        ));
+        );
+        context.replaceContainer("student", c -> ObjectUtil.defaultIfNull(c, supplier.get()));
     }
 
     @Test

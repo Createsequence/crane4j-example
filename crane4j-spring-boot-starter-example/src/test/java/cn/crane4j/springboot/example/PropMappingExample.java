@@ -6,6 +6,7 @@ import cn.crane4j.core.container.ConstantContainer;
 import cn.crane4j.core.executor.handler.MultiKeyAssembleOperationHandler;
 import cn.crane4j.springboot.support.Crane4jApplicationContext;
 import cn.crane4j.springboot.support.OperateTemplate;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.junit.Assert;
@@ -47,8 +48,8 @@ public class PropMappingExample {
             source.put("age", 18 + i);
             sources.put(i, source);
         }
-        context.getRegisteredContainers().putIfAbsent(
-            "student", ConstantContainer.forMap("student", sources)
+        context.replaceContainer(
+            "student", c -> ObjectUtil.defaultIfNull(c, ConstantContainer.forMap("student", sources))
         );
     }
 
