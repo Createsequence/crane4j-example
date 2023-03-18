@@ -3,6 +3,7 @@ package cn.crane4j.mybatis.plus.extension.example;
 import cn.crane4j.annotation.Assemble;
 import cn.crane4j.annotation.Mapping;
 import cn.crane4j.annotation.MappingTemplate;
+import cn.crane4j.annotation.extension.AssembleByMp;
 import cn.crane4j.mybatis.plus.MpMethodContainerProvider;
 import cn.crane4j.springboot.support.OperateTemplate;
 import lombok.Data;
@@ -46,6 +47,7 @@ import java.util.List;
  *
  * SET FOREIGN_KEY_CHECKS = 1;
  * }</pre>
+ * 并准备好对应的实体类{@link Foo}与接口{@link FooMapper}.
  *
  * @author huangchengxing
  */
@@ -131,9 +133,9 @@ public class MpExtensionExample {
 
     // 配置映射模板，上面直接引用模板字段
     @MappingTemplate({
-        @Mapping(src = "name", ref = "userName"),
-        @Mapping(src = "age", ref = "userAge"),
-        @Mapping(src = "sex", ref = "userSex"),
+        @Mapping(src = "userName", ref = "userName"),
+        @Mapping(src = "userAge", ref = "userAge"),
+        @Mapping(src = "userSex", ref = "userSex"),
         @Mapping(src = "id", ref = "id")
     })
     @RequiredArgsConstructor
@@ -147,7 +149,7 @@ public class MpExtensionExample {
             containerProvider = MpMethodContainerProvider.class,
             propTemplates = FooVO.class
         )
-        @Assemble(container = "container('fooMapper', {'name'})",
+        @Assemble(container = "container('fooMapper', {'name as userName'})",
             groups = "testPrimaryKeyAndCustomColumns",
             containerProvider = MpMethodContainerProvider.class,
             propTemplates = FooVO.class
@@ -155,13 +157,17 @@ public class MpExtensionExample {
         private Integer id;
 
         // 声明两个不同组的操作，都基于name字段值进行
-        @Assemble(container = "container('fooMapper', 'name')",
+        //@Assemble(container = "container('fooMapper', 'name')",
+        //    groups = "testCustomKeyAndAllColumns",
+        //    containerProvider = MpMethodContainerProvider.class,
+        //    propTemplates = FooVO.class
+        //)
+        @AssembleByMp(container = "container('fooMapper', 'userName')",
             groups = "testCustomKeyAndAllColumns",
-            containerProvider = MpMethodContainerProvider.class,
             propTemplates = FooVO.class
         )
         @Assemble(
-            container = "container('fooMapper', 'name', {'age'})",
+            container = "container('fooMapper', 'userName', {'userAge'})",
             groups = "testCustomKeyAndCustomColumns",
             containerProvider = MpMethodContainerProvider.class,
             propTemplates = FooVO.class
@@ -170,5 +176,4 @@ public class MpExtensionExample {
         private Integer userAge;
         private Integer userSex;
     }
-
 }
