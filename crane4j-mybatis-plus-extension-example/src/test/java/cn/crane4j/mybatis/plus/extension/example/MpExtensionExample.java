@@ -123,6 +123,17 @@ public class MpExtensionExample {
         checkFoo(foo2, null, "小红", 18, null);
     }
 
+    @Test
+    public void testMethodContainer() {
+        List<FooVO> fooList = Arrays.asList(new FooVO().setId(1), new FooVO().setId(2));
+        operateTemplate.executeIfMatchAnyGroups(fooList, "testMethodContainer");
+
+        FooVO foo1 = fooList.get(0);
+        checkFoo(foo1, 1, "小明", 18, 1);
+        FooVO foo2 = fooList.get(1);
+        checkFoo(foo2, 2, "小红", 18, 0);
+    }
+
     private static void checkFoo(FooVO foo, Integer id, String name, Integer age, Integer sex) {
         Assert.assertNotNull(foo);
         Assert.assertEquals(id, foo.getId());
@@ -142,7 +153,12 @@ public class MpExtensionExample {
     @Accessors(chain = true)
     @Data
     private static class FooVO {
-        // 声明两个不同组的操作，都基于id字段值进行
+        // 声明三个不同组的操作，都基于id字段值进行
+        @Assemble(// 直接基于方法容器进行
+            container = "foo",
+            groups = "testMethodContainer",
+            propTemplates = FooVO.class
+        )
         @Assemble(
             container = "container('fooMapper')",
             groups = "testPrimaryKeyAndAllColumns",
@@ -157,11 +173,6 @@ public class MpExtensionExample {
         private Integer id;
 
         // 声明两个不同组的操作，都基于name字段值进行
-        //@Assemble(container = "container('fooMapper', 'name')",
-        //    groups = "testCustomKeyAndAllColumns",
-        //    containerProvider = MpMethodContainerProvider.class,
-        //    propTemplates = FooVO.class
-        //)
         @AssembleByMp(container = "container('fooMapper', 'userName')",
             groups = "testCustomKeyAndAllColumns",
             propTemplates = FooVO.class
