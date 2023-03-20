@@ -3,7 +3,7 @@ package cn.crane4j.springboot.example;
 import cn.crane4j.annotation.Assemble;
 import cn.crane4j.annotation.Mapping;
 import cn.crane4j.core.container.ConstantContainer;
-import cn.crane4j.core.executor.handler.MultiKeyAssembleOperationHandler;
+import cn.crane4j.core.executor.handler.ManyToManyReflexAssembleOperationHandler;
 import cn.crane4j.springboot.support.Crane4jApplicationContext;
 import cn.crane4j.springboot.support.OperateTemplate;
 import cn.hutool.core.util.ObjectUtil;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * 演示如何使用属性映射
+ * 演示如何使用属性映射，包括一对一装配情况下的属性映射，以及批量装配情况下的属性映射
  *
  * @author huangchengxing
  */
@@ -141,6 +141,7 @@ public class PropMappingExample {
         public StudentVO(Integer key) {
             this.key = key;
         }
+        // 默认为一对一装配
         @Assemble(container = "student", props = {
             @Mapping(src = "name", ref = "name"), // s.name -> t.name
             @Mapping(src = "age", ref = "age"),   // s.age -> t.age
@@ -156,8 +157,9 @@ public class PropMappingExample {
     @RequiredArgsConstructor
     @Data
     private static class Classroom {
+        // 批量装配，这里选择的是多对多装配
         @Assemble(
-            container = "student", handler = MultiKeyAssembleOperationHandler.class,
+            container = "student", handler = ManyToManyReflexAssembleOperationHandler.class,
             props = {
                 @Mapping(src = "name", ref = "studentNames"), // [s, s, s] -> [s.name, s.name, s.name] -> t.studentNames
                 @Mapping(ref = "students")                    // [s, s, s] -> [s, s, s] -> t.students
